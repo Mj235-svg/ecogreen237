@@ -60,6 +60,9 @@ export default function Feed() {
 
       {filtered.map((item) => (
         <div className="feed-item" key={item.id}>
+          {item.image_url && (
+            <img className="feed-image" src={item.image_url} alt="" />
+          )}
           <div className="feed-top">
             <span className="source-tag">{item.source}</span>
             <span className="feed-time">
