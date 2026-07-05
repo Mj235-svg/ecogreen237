@@ -21,9 +21,14 @@ export default function Admin() {
   const [courseForm, setCourseForm] = useState({
     title: "", description: "", kind: "interne", partner: "", external_url: "", filiere: "toutes",
   });
+  const [courseFile, setCourseFile] = useState(null);
+  const [uploadingCourse, setUploadingCourse] = useState(false);
 
   // --- news form ---
   const [newsForm, setNewsForm] = useState({ source: "MINADER", title: "", body: "", url: "" });
+  const [newsImage, setNewsImage] = useState(null);
+  const [uploadingNews, setUploadingNews] = useState(false);
+
 
   // --- invite codes ---
   const [codes, setCodes] = useState([]);
@@ -69,16 +74,65 @@ export default function Admin() {
 
   async function publishCourse(e) {
     e.preventDefault();
-    await supabase.from("courses").insert({ ...courseForm, created_by: profile.id, published: true });
-    setCourseForm({ title: "", description: "", kind: "interne", partner: "", external_url: "", filiere: "toutes" });
-    alert("Formation publiée.");
+    setUploadingCourse(true);
+    let file_url = null;
+    let file_name = null;
+
+    try {
+      if (courseFile) {
+        const path = `${Date.now()}-${courseFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("course-files")
+          .upload(path, courseFile);
+        if (uploadError) throw uploadError;
+        const { data: pub } = supabase.storage.from("course-files").getPublicUrl(path);
+        file_url = pub.publicUrl;
+        file_name = courseFile.name;
+      }
+
+      await supabase.from("courses").insert({
+        ...courseForm,
+        file_url,
+        file_name,
+        created_by: profile.id,
+        published: true,
+      });
+
+      setCourseForm({ title: "", description: "", kind: "interne", partner: "", external_url: "", filiere: "toutes" });
+      setCourseFile(null);
+      alert("Formation publiée.");
+    } catch (err) {
+      alert("Erreur lors de la publication : " + err.message);
+    } finally {
+      setUploadingCourse(false);
+    }
   }
 
   async function publishNews(e) {
     e.preventDefault();
-    await supabase.from("news_items").insert({ ...newsForm, created_by: profile.id });
-    setNewsForm({ source: "MINADER", title: "", body: "", url: "" });
-    alert("Actualité publiée sur le fil.");
+    setUploadingNews(true);
+    let image_url = null;
+
+    try {
+      if (newsImage) {
+        const path = `${Date.now()}-${newsImage.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("news-images")
+          .upload(path, newsImage);
+        if (uploadError) throw uploadError;
+        const { data: pub } = supabase.storage.from("news-images").getPublicUrl(path);
+        image_url = pub.publicUrl;
+      }
+
+      await supabase.from("news_items").insert({ ...newsForm, image_url, created_by: profile.id });
+      setNewsForm({ source: "MINADER", title: "", body: "", url: "" });
+      setNewsImage(null);
+      alert("Actualité publiée sur le fil.");
+    } catch (err) {
+      alert("Erreur lors de la publication : " + err.message);
+    } finally {
+      setUploadingNews(false);
+    }
   }
 
   async function createCode() {
@@ -222,7 +276,17 @@ export default function Admin() {
                   </div>
                 </>
               )}
-              <button className="btn btn-primary">Publier sur la plateforme</button>
+              <div className="form-row">
+                <label>Fichier de formation (PDF, vidéo, document — optionnel)</label>
+                <input
+                  type="file"
+                  onChange={(e) => setCourseFile(e.target.files?.[0] || null)}
+                />
+                {courseFile && <div className="file-chip">📎 {courseFile.name}</div>}
+              </div>
+              <button className="btn btn-primary" disabled={uploadingCourse}>
+                {uploadingCourse ? "Publication en cours…" : "Publier sur la plateforme"}
+              </button>
             </form>
           </div>
         )}
@@ -232,8 +296,8 @@ export default function Admin() {
             <h3>Publier une actualité sur le fil</h3>
             <p className="muted-text">
               Utilisez ce formulaire pour relayer manuellement une publication LinkedIn ou d'un
-              site sans flux RSS. Pour la Banque Mondiale/GIZ/UE, un flux automatique peut être
-              branché ici plus tard (voir le README, section "Automatiser le fil").
+              site sans flux RSS. Pour la Banque Mondiale/GIZ/UE, le fil s'alimente aussi
+              automatiquement toutes les 6 heures.
             </p>
             <form onSubmit={publishNews}>
               <div className="form-row">
@@ -275,7 +339,18 @@ export default function Admin() {
                   onChange={(e) => setNewsForm({ ...newsForm, url: e.target.value })}
                 />
               </div>
-              <button className="btn btn-primary">Publier sur le fil</button>
+              <div className="form-row">
+                <label>Image (optionnel)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setNewsImage(e.target.files?.[0] || null)}
+                />
+                {newsImage && <div className="file-chip">🖼️ {newsImage.name}</div>}
+              </div>
+              <button className="btn btn-primary" disabled={uploadingNews}>
+                {uploadingNews ? "Publication en cours…" : "Publier sur le fil"}
+              </button>
             </form>
           </div>
         )}
