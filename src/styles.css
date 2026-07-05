@@ -94,16 +94,18 @@ footer strong{color:#fff;}
 .chip{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:0.4rem 0.9rem;font-size:0.82rem;font-weight:600;color:var(--muted);cursor:pointer;}
 .chip.active{background:var(--green-deep);color:#fff;border-color:var(--green-deep);}
 
-.feed-item{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:0.8rem;}
+.feed-item{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:0.8rem;overflow:hidden;}
+.feed-image{width:100%;max-height:280px;object-fit:cover;border-radius:10px;margin-bottom:0.9rem;}
 .feed-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
 .source-tag{display:inline-flex;font-size:0.76rem;font-weight:700;padding:0.22rem 0.6rem;border-radius:999px;background:var(--green-soft);color:var(--green-deep);}
 .source-pill{display:inline-block;font-size:0.7rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:999px;background:var(--green-soft);color:var(--green-deep);margin-right:0.4rem;}
-.feed-time{font-size:0.76rem;color:var(--muted);}
-.feed-item h4{margin:0 0 0.35rem;font-size:0.98rem;}
-.feed-item p{margin:0;color:var(--muted);font-size:0.87rem;line-height:1.5;}
+.feed-time{font-size:0.76rem;color:var(--muted);flex:none;white-space:nowrap;margin-left:0.6rem;}
+.feed-item h4{margin:0 0 0.35rem;font-size:0.98rem;overflow-wrap:anywhere;word-break:break-word;}
+.feed-item p{margin:0;color:var(--muted);font-size:0.87rem;line-height:1.5;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap;}
 .feed-item .lk{margin-top:0.5rem;display:inline-block;font-size:0.82rem;font-weight:700;color:var(--green-deep);}
 .mini-news{padding:0.5rem 0;border-bottom:1px solid var(--line);font-size:0.85rem;}
 .mini-news:last-child{border-bottom:none;}
+.file-chip{margin-top:0.5rem;font-size:0.82rem;color:var(--green-deep);background:var(--green-soft);display:inline-block;padding:0.3rem 0.7rem;border-radius:8px;}
 
 .side-card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem;}
 .side-card h3{margin:0 0 0.8rem;font-size:1rem;}
