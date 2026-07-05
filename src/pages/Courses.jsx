@@ -57,6 +57,11 @@ export default function Courses() {
                   Voir le programme officiel
                 </a>
               )}
+              {c.kind === "interne" && c.file_url && (
+                <a href={c.file_url} target="_blank" rel="noreferrer" download className="btn btn-primary" style={{ marginTop: "0.8rem", display: "inline-block" }}>
+                  📥 Télécharger {c.file_name ? `(${c.file_name})` : ""}
+                </a>
+              )}
             </div>
           </div>
         ))}
